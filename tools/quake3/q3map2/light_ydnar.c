@@ -1349,13 +1349,13 @@ float DirtForSample( trace_t *trace ){
 
 	/* check if the normal is aligned to the world-up */
 	if ( normal[ 0 ] == 0.0f && normal[ 1 ] == 0.0f ) {
-		if ( normal[ 2 ] == 1.0f ) {
-			VectorSet( myRt, 1.0f, 0.0f, 0.0f );
-			VectorSet( myUp, 0.0f, 1.0f, 0.0f );
-		}
-		else if ( normal[ 2 ] == -1.0f ) {
+		if ( normal[ 2 ] == -1.0f ) {
 			VectorSet( myRt, -1.0f, 0.0f, 0.0f );
 			VectorSet( myUp,  0.0f, 1.0f, 0.0f );
+		}
+		else {
+			VectorSet( myRt, 1.0f, 0.0f, 0.0f );
+			VectorSet( myUp, 0.0f, 1.0f, 0.0f );
 		}
 	}
 	else
@@ -2417,14 +2417,13 @@ void IlluminateRawLightmap( int rawLightmapNum ){
 void IlluminateVertexes( int num ){
 	int i, x, y, z, x1, y1, z1, sx, sy, radius, maxRadius, *cluster;
 	int lightmapNum, numAvg;
-	float samples, *vertLuxel, *radVertLuxel, *luxel, dirt;
-	vec3_t origin, temp, temp2, colors[ MAX_LIGHTMAPS ], avgColors[ MAX_LIGHTMAPS ];
+	float samples, *vertLuxel, *radVertLuxel, *luxel, dirt = 0.0f;
+	vec3_t origin = {0, 0, 0}, temp, temp2, colors[ MAX_LIGHTMAPS ], avgColors[ MAX_LIGHTMAPS ];
 	bspDrawSurface_t    *ds;
 	surfaceInfo_t       *info;
 	rawLightmap_t       *lm;
 	bspDrawVert_t       *verts;
-	trace_t trace;
-
+	trace_t             trace = {};
 
 	/* get surface, info, and raw lightmap */
 	ds = &bspDrawSurfaces[ num ];
@@ -2444,6 +2443,7 @@ void IlluminateVertexes( int num ){
 		trace.numSurfaces = 1;
 		trace.surfaces = &num;
 		trace.inhibitRadius = DEFAULT_INHIBIT_RADIUS;
+		trace.testAll = qfalse;
 
 		/* twosided lighting */
 		trace.twoSided = info->si->twoSided;
